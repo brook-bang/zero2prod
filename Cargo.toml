@@ -1,0 +1,30 @@
+[package]
+name = "zero2prod"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+path = "src/lib.rs"
+
+[[bin]]
+name = "zero2prod"
+path = "src/main.rs"
+
+[dependencies]
+config = "0.15.11"
+actix-web = { version = "4.11.0" }
+tokio = { version = "1.45.0", features = ["full"] }
+serde = { version = "1.0.219", features = ["derive"] }
+sqlx = { version = "0.8.6", features = [
+    "runtime-tokio-rustls",
+    "postgres",
+    "migrate",
+    "macros",
+    "uuid",
+    "chrono"
+] }
+uuid = { version = "1.17.0", features = ["v4"] }
+chrono = { version = "0.4.41", features = ["serde"] }
+
+[dev-dependencies]
+reqwest = "0.12.5"
