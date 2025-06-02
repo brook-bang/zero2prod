@@ -1,0 +1,9 @@
+application:
+  host: 0.0.0.0
+  port: 8000
+  database:
+    host: "db.production.example.com"
+    port: 5432
+    username: "prod_user"
+    password: "prod_password"
+    database_name: "newsletter_prod"
