@@ -2,9 +2,14 @@ application:
   port: 8000
   host: 0.0.0.0
 database:
-    host: "127.0.0.1"
-    port: 5432
-    username: "postgres"
-    password: "password"
-    database_name: "newsletter"
-    require_ssl: false
+  host: "127.0.0.1"
+  port: 5432
+  username: "postgres"
+  password: "password"
+  database_name: "newsletter"
+  require_ssl: false
+email_client:
+  base_url: "localhost"
+  sender_email: "1455047806@brookbang.xyz"
+  authorization_token: "52186294-2d53-4519-9564-c96eea0a59f4"
+  timeout_milliseconds: 10000

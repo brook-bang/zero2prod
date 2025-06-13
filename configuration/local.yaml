@@ -2,3 +2,7 @@ application:
   host: 127.0.0.1
 database:
   require_ssl: false
+# email_client:
+#   base_url: "localhost"
+#   sender_email: "1455047806@brookbang.xyz"
+#   authorization_token: "52186294-2d53-4519-9564-c96eea0a59f4"
