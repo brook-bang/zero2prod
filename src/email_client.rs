@@ -10,16 +10,6 @@ pub struct EmailClient {
     authorization_token: Secret<String>,
 }
 
-#[derive(Serialize)]
-#[serde(rename_all = "PascalCase")]
-struct SendEmailRequest<'a> {
-    from: &'a str,
-    to: &'a str,
-    subject: &'a str,
-    html_body: &'a str,
-    text_body: &'a str,
-}
-
 impl EmailClient {
     pub fn new(
         base_url: String,
@@ -64,6 +54,15 @@ impl EmailClient {
         Ok(())
     }
 }
+#[derive(Serialize)]
+#[serde(rename_all = "PascalCase")]
+struct SendEmailRequest<'a> {
+    from: &'a str,
+    to: &'a str,
+    subject: &'a str,
+    html_body: &'a str,
+    text_body: &'a str,
+}
 
 #[cfg(test)]
 mod tests {
@@ -77,15 +76,15 @@ mod tests {
     use secrecy::Secret;
     use wiremock::matchers::any;
     use wiremock::matchers::{header, header_exists, method, path};
+    use wiremock::Request;
     use wiremock::{Mock, MockServer, ResponseTemplate};
 
     struct SendEmailBodyMatcher;
 
     impl wiremock::Match for SendEmailBodyMatcher {
-        fn matches(&self, request: &wiremock::Request) -> bool {
+        fn matches(&self, request: &Request) -> bool {
             let result: Result<serde_json::Value, _> = serde_json::from_slice(&request.body);
             if let Ok(body) = result {
-                dbg!(&body);
                 body.get("From").is_some()
                     && body.get("To").is_some()
                     && body.get("Subject").is_some()
@@ -95,6 +94,27 @@ mod tests {
                 false
             }
         }
+    }
+
+    fn subject() -> String {
+        Sentence(1..2).fake()
+    }
+
+    fn content() -> String {
+        Paragraph(1..10).fake()
+    }
+
+    fn email() -> SubscriberEmail {
+        SubscriberEmail::parse(SafeEmail().fake()).unwrap()
+    }
+
+    fn email_client(base_url: String) -> EmailClient {
+        EmailClient::new(
+            base_url,
+            email(),
+            Secret::new(Faker.fake()),
+            std::time::Duration::from_millis(200),
+        )
     }
 
     #[tokio::test]
@@ -171,26 +191,5 @@ mod tests {
             .await;
 
         assert_err!(outcome);
-    }
-
-    fn subject() -> String {
-        Sentence(1..2).fake()
-    }
-
-    fn content() -> String {
-        Paragraph(1..10).fake()
-    }
-
-    fn email() -> SubscriberEmail {
-        SubscriberEmail::parse(SafeEmail().fake()).unwrap()
-    }
-
-    fn email_client(base_url: String) -> EmailClient {
-        EmailClient::new(
-            base_url,
-            email(),
-            Secret::new(Faker.fake()),
-            std::time::Duration::from_millis(200),
-        )
     }
 }
