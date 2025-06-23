@@ -2,7 +2,7 @@ use std::net::TcpListener;
 
 use crate::configuration::DatabaseSettings;
 use crate::email_client::EmailClient;
-use crate::routes::confirm;
+use crate::routes::{confirm, publish_newsletter};
 use crate::{
     configuration::Settings,
     routes::{health_check, subscribe},
@@ -74,6 +74,7 @@ fn run(
     let server = HttpServer::new(move || {
         App::new()
             .wrap(TracingLogger::default())
+            .route("/newsletters", web::post().to(publish_newsletter))
             .route("/health_check", web::get().to(health_check))
             .route("/subscriptions", web::post().to(subscribe))
             .route("/subscriptions/confirm", web::get().to(confirm))

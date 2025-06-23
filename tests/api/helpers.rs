@@ -1,7 +1,7 @@
-use std::sync::LazyLock;
 use secrecy::Secret;
 use sqlx::Executor;
 use sqlx::{Connection, PgConnection, PgPool};
+use std::sync::LazyLock;
 use uuid::Uuid;
 use wiremock::MockServer;
 use zero2prod::configuration::{DatabaseSettings, get_configuration};
@@ -30,7 +30,6 @@ pub struct ConfirmationLinks {
     pub html: reqwest::Url,
     pub plain_text: reqwest::Url,
 }
-
 
 impl TestApp {
     pub async fn post_subscriptions(&self, body: String) -> reqwest::Response {
@@ -64,6 +63,15 @@ impl TestApp {
         let plain_text = get_link(body["TextBody"].as_str().unwrap());
         ConfirmationLinks { html, plain_text }
     }
+
+    pub async fn post_newsletters(&self, body: serde_json::Value) -> reqwest::Response {
+        reqwest::Client::new()
+            .post(&format!("{}/newsletters", &self.address))
+            .json(&body)
+            .send()
+            .await
+            .expect("Failed to execute request.")
+    }
 }
 
 pub async fn spawn_app() -> TestApp {
@@ -96,7 +104,7 @@ pub async fn spawn_app() -> TestApp {
 }
 
 async fn configure_database(config: &DatabaseSettings) -> PgPool {
-       let maintenance_settings = DatabaseSettings {
+    let maintenance_settings = DatabaseSettings {
         database_name: "postgres".to_string(),
         username: "postgres".to_string(),
         password: Secret::new("password".to_string()),
